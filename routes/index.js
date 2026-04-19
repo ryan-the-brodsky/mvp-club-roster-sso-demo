@@ -2,6 +2,7 @@ import express from 'express'
 import session from 'express-session'
 import { WorkOS } from '@workos-inc/node'
 
+
 const app = express()
 const router = express.Router()
 
@@ -100,6 +101,70 @@ router.get('/logout', async (req, res) => {
     } catch (error) {
         res.render('error.ejs', { error: error })
     }
+})
+
+router.get('/directories', async (req, res) => {
+    let before = req.query.before
+    let after = req.query.after
+    const directories = await workos.directorySync.listDirectories({
+        limit: 5,
+        before: before,
+        after: after,
+        order: null,
+    })
+    console.log("DIRECORIES")
+    console.log(directories)
+
+    before = directories.listMetadata.before
+    after = directories.listMetadata.after
+
+    res.render('directories.ejs', {
+        title: 'Home',
+        directories: directories.data,
+        before: before,
+        after: after,
+    })
+})
+
+router.get('/directory', async (req, res) => {
+    const directories = await workos.directorySync.listDirectories()
+    const directory = directories.data.filter((directory) => {
+        return directory.id == req.query.id
+    })[0]
+    res.render('directory.ejs', {
+        directory: directory,
+        title: 'Directory',
+    })
+})
+
+router.get('/users', async (req, res) => {
+    const directoryId = req.query.id
+    const users = await workos.directorySync.listUsers({
+        directory: directoryId,
+        limit: 100,
+    })
+    res.render('users.ejs', { users: users.data })
+})
+
+router.get('/groups', async (req, res) => {
+    const directoryId = req.query.id
+    const groups = await workos.directorySync.listGroups({
+        directory: directoryId,
+        limit: 100,
+    })
+    res.render('groups.ejs', { groups: groups.data })
+})
+
+router.post('/webhooks', async (req, res) => {
+    const webhook = workos.webhooks.constructEvent({
+        payload: req.body,
+        sigHeader: req.headers['workos-signature'],
+        secret: process.env.WORKOS_WEBHOOK_SECRET,
+        tolerance: 90000,
+    })
+    io.emit('webhook event', { webhook })
+
+    res.sendStatus(200)
 })
 
 export default router

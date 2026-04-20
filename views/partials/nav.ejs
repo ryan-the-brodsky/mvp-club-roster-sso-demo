@@ -1,0 +1,38 @@
+<%
+  var authed = typeof authed !== 'undefined' ? authed : false;
+  var active = typeof active !== 'undefined' ? active : '';
+  var firstName = typeof first_name !== 'undefined' && first_name ? first_name : '';
+%>
+<nav class="pan-nav" aria-label="Primary">
+  <div class="pan-nav-inner">
+    <a href="/" class="pan-brand" aria-label="The Panopticon — home">
+      <svg class="pan-brand-mark" viewBox="0 0 400 200" aria-hidden="true" focusable="false">
+        <path d="M 20 100 Q 200 0 380 100 Q 200 200 20 100 Z" fill="#12315a" stroke="#eba714" stroke-width="8"/>
+        <circle cx="200" cy="100" r="58" fill="#eba714"/>
+        <circle cx="200" cy="100" r="22" fill="#081f3f"/>
+      </svg>
+      <span>The Panopticon</span>
+    </a>
+
+    <% if (authed) { %>
+      <div class="pan-nav-links">
+        <a href="/" class="pan-nav-link <%= active === 'eye' ? 'active' : '' %>">The Eye</a>
+        <a href="/users" class="pan-nav-link <%= active === 'subjects' ? 'active' : '' %>">Subjects</a>
+        <a href="/directories" class="pan-nav-link <%= active === 'jurisdictions' ? 'active' : '' %>">Jurisdictions</a>
+        <a href="/webhooks" class="pan-nav-link <%= active === 'confessions' ? 'active' : '' %>">Confessions</a>
+        <button type="button"
+                class="pan-audio-toggle"
+                id="pan-audio-toggle"
+                title="Grant the Panopticon permission to speak"
+                aria-label="Toggle audio"
+                aria-pressed="false">🔇</button>
+        <% if (firstName) { %><span class="pan-nav-user">Subject <strong><%= firstName %></strong></span><% } %>
+        <a href="/logout" class="pan-nav-link" title="Escape is an illusion">Logout</a>
+      </div>
+    <% } else { %>
+      <div class="pan-nav-links">
+        <a href="/" class="pan-nav-link <%= active === 'landing' ? 'active' : '' %>">Present yourself</a>
+      </div>
+    <% } %>
+  </div>
+</nav>

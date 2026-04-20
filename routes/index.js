@@ -1,19 +1,8 @@
 import express from 'express'
-import session from 'express-session'
 import { WorkOS } from '@workos-inc/node'
 
 
-const app = express()
 const router = express.Router()
-
-app.use(
-    session({
-        secret: 'keyboard cat',
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: true },
-    })
-)
 
 const workos = new WorkOS(process.env.WORKOS_API_KEY)
 const connectionID = process.env.WORKOS_CONNECTION_ID
@@ -23,10 +12,10 @@ const redirectURI = `${process.env.HOST_URL}/callback`
 const state = ''
 
 router.get('/', function (req, res) {
-    if (session.isloggedin) {
+    if (req.session.isloggedin) {
         res.render('login_successful.ejs', {
-            profile: session.profile,
-            first_name: session.first_name,
+            profile: req.session.profile,
+            first_name: req.session.first_name,
         })
     } else {
         res.render('index.ejs', { title: 'Home' })
@@ -73,9 +62,9 @@ router.get('/callback', async (req, res) => {
             })
             const json_profile = JSON.stringify(profile, null, 4)
 
-            session.first_name = profile.profile.first_name
-            session.profile = json_profile
-            session.isloggedin = true
+            req.session.first_name = profile.profile.first_name
+            req.session.profile = json_profile
+            req.session.isloggedin = true
         }
     } catch (error) {
         errorMessage = `Error exchanging code for profile: ${error}`
@@ -93,9 +82,9 @@ router.get('/callback', async (req, res) => {
 
 router.get('/logout', async (req, res) => {
     try {
-        session.first_name = null
-        session.profile = null
-        session.isloggedin = null
+        req.session.first_name = null
+        req.session.profile = null
+        req.session.isloggedin = null
 
         res.redirect('/')
     } catch (error) {

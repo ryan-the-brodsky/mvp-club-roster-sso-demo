@@ -1,53 +1,41 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="../public/stylesheets/style.css" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter" />
-    </head>
-    
-    <body class="height-100vh">
-        <div class="logged_in_nav">
-            <div class="flex">
-                <div>
-                    <img src="../public/images/workos-logo-with-text.png" alt="workos logo" />
-                </div>
-            </div>
-            <div class="flex">
-                <a href="https://workos.com/docs" target="_blank">
-                    <button class="button nav-item">Documentation</button>
-                </a>
-                <a href="https://workos.com/docs/reference" target="_blank">
-                    <button class="button nav-item">API Reference</button>
-                </a>
-                <a href="https://workos.com/blog" target="_blank">
-                    <button class="button nav-item blog-nav-button">Blog</button>
-                </a>
-                <a href="https://workos.com/" target="_blank">
-                    <button class="button button-outline">WorkOS</button>
-                </a>
-            </div>
-        </div>
-        <div class="flex flex_column height-80vh">
-            <div class="flex height-40vh">
-                <div class="card height-315 width-335">
-                    <form method="POST" action="/login" class="mb-0">
-                        <div class="flex_column">
-                            <div>
-                                <span>Log in with SSO</span>
-                            </div>
-                            <hr style="width: 100%; margin-top: 15px; margin-bottom: 20px;" />
-                            <button id="Google" name="login_method" value="GoogleOAuth" class="card login_button google_button">
-                                <span>Google OAuth</span>
-                            </button>
-                            <button id="Microsoft" name="login_method" value="MicrosoftOAuth" class="card login_button microsoft_button">
-                                <span>Microsoft OAuth</span>
-                            </button>
-                            <button id="SAML" name="login_method" value="saml" class="card login_button saml_button mb-0">
-                                <span>Enterprise SAML</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </body>
+<!doctype html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { title: 'Present yourself' }) %>
+</head>
+
+<body class="dim">
+  <%- include('partials/nav', { authed: false, active: 'landing' }) %>
+
+  <main class="pan-landing">
+    <div class="pan-landing-inner">
+      <img src="/public/images/eye.svg" alt="" class="pan-eye pulsing" aria-hidden="true" style="max-width: 460px;">
+
+      <h1>The Panopticon.</h1>
+      <p class="flavor">Every sign-in is an act of surrender.<br>Present yourself.</p>
+
+      <div class="pan-card">
+        <h3>Surrender credentials</h3>
+        <p class="submit-copy">The Panopticon accepts offerings from the following federated authorities. Your choice is catalogued.</p>
+
+        <form method="POST" action="/login" class="pan-sso-group">
+          <button type="submit" name="login_method" value="GoogleOAuth" class="pan-sso-btn primary-path">
+            <span class="provider-mark">◉</span>
+            <span>Submit via Google</span>
+          </button>
+          <button type="submit" name="login_method" value="MicrosoftOAuth" class="pan-sso-btn">
+            <span class="provider-mark">◈</span>
+            <span>Submit via Microsoft</span>
+          </button>
+          <button type="submit" name="login_method" value="saml" class="pan-sso-btn">
+            <span class="provider-mark">※</span>
+            <span>Submit via Enterprise SAML</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
 </html>

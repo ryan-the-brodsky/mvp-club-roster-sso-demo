@@ -1,5 +1,6 @@
 import express from 'express'
 import 'dotenv/config'
+import session from 'express-session'
 import router from './routes/index.js'
 import morgan from 'morgan'
 import { Server } from 'socket.io'
@@ -16,6 +17,15 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 app.use(morgan('dev'))
+
+app.use(
+    session({
+        secret: 'keyboard cat',
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: true },
+    })
+)
 
 app.use('/', router)
 

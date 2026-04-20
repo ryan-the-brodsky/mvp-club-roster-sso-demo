@@ -1,54 +1,73 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="../public/stylesheets/style.css" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter" />
-    </head>
-    
-    <body class="container_success">
-        <div class="logged_in_nav">
-            <div class="flex">
-                <div>
-                    <img src="../public/images/workos-logo-with-text.png" alt="workos logo" />
-                </div>
-            </div>
-            <div class="flex">
-                <a href="https://workos.com/docs" target="_blank">
-                    <button class="button nav-item">Documentation</button>
-                </a>
-                <a href="https://workos.com/docs/reference" target="_blank">
-                    <button class="button nav-item">API Reference</button>
-                </a>
-                <a href="https://workos.com/blog" target="_blank">
-                    <button class="button nav-item blog-nav-button">Blog</button>
-                </a>
-                <a href="https://workos.com/" target="_blank">
-                    <button class="button button-outline">WorkOS</button>
-                </a>
-            </div>
+<!doctype html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { title: 'The Eye' }) %>
+</head>
+
+<body>
+  <%- include('partials/nav', { authed: true, active: 'eye', first_name: first_name }) %>
+
+  <main class="pan-main">
+    <div class="pan-eye-layout">
+      <div class="pan-eye-hero">
+        <img src="/public/images/eye.svg" class="pan-eye pulsing" alt="The Eye">
+        <p class="flavor">The Eye never closes.<br>The Eye never forgets.</p>
+      </div>
+
+      <div class="pan-eye-side">
+        <div class="pan-card">
+          <div class="pan-counter-label">Confessions witnessed</div>
+          <div class="pan-counter" id="pan-counter">0</div>
+          <div class="pan-muted" style="font-size:0.82rem;">since you presented yourself</div>
         </div>
-        <div class="flex">
-            <div class="logged_in_div_right">
-                <div class="flex_column">
-                    <div class="flex width-941px space-between">
-                        <div>
-                            <p>Profile Details</p>
-                        </div>
-                        <div>
-                            <a href="/logout">
-                                <button class="button button-outline">
-                                    Log Out
-                                </button>
-                            </a>
-                        </div>
-                    </div>
-                    <div>
-                        <pre id="noborder" class="prettyprint noborder">
-                            <%= profile %>
-                        </pre>
-                    </div>
-                </div>
-            </div>
+
+        <div class="pan-card">
+          <div class="pan-spread" style="margin-bottom:14px;">
+            <strong style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted);">Recent confessions</strong>
+            <a href="/webhooks" class="pan-muted" style="font-size:0.82rem;">See all →</a>
+          </div>
+          <div class="pan-feed" id="pan-tail">
+            <div class="pan-empty" style="padding:20px 8px;">The Eye waits. The Panopticon is patient.</div>
+          </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
-    </body>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/js/panopticon.js"></script>
+  <script>
+    (function () {
+      const counterEl = document.getElementById('pan-counter');
+      const tailEl = document.getElementById('pan-tail');
+      const MAX_TAIL = 6;
+      let count = 0;
+      let emptyCleared = false;
+
+      Panopticon.onEvent(function (ev) {
+        count += 1;
+        counterEl.textContent = count;
+
+        if (!emptyCleared) {
+          tailEl.innerHTML = '';
+          emptyCleared = true;
+        }
+
+        const row = document.createElement('div');
+        row.className = 'pan-event sev-' + ev.severity;
+        row.innerHTML =
+          '<span class="pan-pill type-pill sev-' + ev.severity + '">' + ev.type + '</span>' +
+          '<div class="narration">' + ev.narration + '</div>' +
+          '<div class="ts">' + ev.ts.toLocaleTimeString() + '</div>';
+        tailEl.prepend(row);
+
+        while (tailEl.children.length > MAX_TAIL) {
+          tailEl.removeChild(tailEl.lastChild);
+        }
+      });
+    })();
+  </script>
+</body>
 </html>

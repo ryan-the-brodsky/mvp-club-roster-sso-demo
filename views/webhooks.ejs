@@ -1,72 +1,125 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="../public/stylesheets/style.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter">
-    </head>
+<!doctype html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { title: 'Confessions' }) %>
+</head>
 
-    <body class="container_success">
-        <div class="logged_in_nav">
-            <div class="flex">
-                <div>
-                    <img src="../public/images/workos-logo-with-text.png" alt="workos logo">
-                </div>
-            </div>
-            <div>
-                <a href="https://workos.com/docs" target="_blank"><button class='button nav-item'>Documentation</button></a>
-                <a href="https://workos.com/docs/reference" target="_blank"><button class='button nav-item'>API
-                        Reference</button></a>
-                <a href="https://workos.com/blog" target="_blank"><button
-                        class='button nav-item blog-nav-button'>Blog</button></a>
-                <a href="https://workos.com/" target="_blank"><button class='button button-outline'>WorkOS</button></a>
-            </div>
-        </div>
-            <div class="logged_in_div_right">
-                <div id="webhooks-view-div" class="flex_column">
-                    <div class="flex width-40vw space-between">
-                        <h2>Live Webhooks View</h2>
-                        <div id="tutorial_button">
-                            <a href="https://workos.com/blog/test-workos-webhooks-locally-ngrok" target="_blank"
-                                class="button mt-15">Tutorial</a>
-                                <a href="/webhooks" class="button mt-10">Clear</a>
-                            <a href="javascript:history.back()"><button class='button button-outline'>Back</button></a>
-                        </div>
-                    </div>
-                    <div id="webhooks-view" class="width-40vw webhooks-container">
-    
-                    </div>
-                </div>   
-            </div>
-        </div>
-        <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" charset="utf-8">
-            var counter = 0
-            var webhooksView = document.getElementById('webhooks-view')
-            var clearButtonDiv = document.getElementById('clear_button_div')
-            var clearButton = document.getElementById('clear_button')
-            var tutorialButton = document.getElementById('tutorial_button')
+<body>
+  <%- include('partials/nav', { authed: true, active: 'confessions' }) %>
 
-            var socket = io()
-            socket.on('connect', function () {
-                console.log('socket connection successful')
-            })
+  <main class="pan-main">
+    <header class="pan-page-header pan-spread">
+      <div>
+        <h1>Confessions</h1>
+        <p class="flavor">
+          <span id="pan-total" style="font-variant-numeric: tabular-nums;">0</span> confession<span id="pan-total-plural">s</span> witnessed this session. The Panopticon transcribes all.
+        </p>
+      </div>
+      <div class="pan-row" style="gap:8px;">
+        <button type="button" id="pan-clear" class="pan-btn pan-btn-ghost">Clear log</button>
+        <a href="https://workos.com/blog/test-workos-webhooks-locally-ngrok" target="_blank" rel="noopener" class="pan-btn pan-btn-secondary">Test webhooks</a>
+      </div>
+    </header>
 
-            socket.on('webhook event', (data) => {
-                webhooksView.classList.add("webhooks_container")
-                webhooksView.insertAdjacentHTML("afterbegin",
-                    "<div class='margin_top width-40vw'> Webhook received at: " + new Date().toISOString() + "</div>" +
-                    "<br/>" +
-                    "<pre>" + "<code>" + JSON.stringify(data.webhook, null, 2) + "</code>" + "</pre>" +
-                    "<br/>" + "<hr/>" + "<br/>"
-                );
-                if (counter < 1) {
-                    clearButtonDiv.classList.remove('login_button')
-                    clearButtonDiv.classList.add('flex_right')
-                    clearButton.classList.remove('hidden')
-                    tutorialButton.classList.add('hidden')
-                    counter++
-                }
-            })
-        </script>
-        <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
-    </body>
+    <div class="pan-chips" role="group" aria-label="Filter confessions">
+      <span class="pan-chips-label">Filter</span>
+      <button type="button" class="pan-chip active" data-cat="all">All <span class="count" data-count="all">0</span></button>
+      <button type="button" class="pan-chip" data-cat="arrival">Arrivals <span class="count" data-count="arrival">0</span></button>
+      <button type="button" class="pan-chip" data-cat="departure">Departures <span class="count" data-count="departure">0</span></button>
+      <button type="button" class="pan-chip" data-cat="amendment">Amendments <span class="count" data-count="amendment">0</span></button>
+      <button type="button" class="pan-chip" data-cat="collective">Collective <span class="count" data-count="collective">0</span></button>
+      <button type="button" class="pan-chip" data-cat="other">Other <span class="count" data-count="other">0</span></button>
+    </div>
+
+    <div class="pan-feed" id="pan-log">
+      <div class="pan-empty" id="pan-empty" style="padding:48px 24px;">
+        Silence. The Panopticon waits for its first confession.
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/js/panopticon.js"></script>
+  <script>
+    (function () {
+      const logEl = document.getElementById('pan-log');
+      const emptyEl = document.getElementById('pan-empty');
+      const totalEl = document.getElementById('pan-total');
+      const totalPluralEl = document.getElementById('pan-total-plural');
+      const chipsEl = document.querySelector('.pan-chips');
+      const clearBtn = document.getElementById('pan-clear');
+
+      const counts = { all: 0, arrival: 0, departure: 0, amendment: 0, collective: 0, other: 0 };
+      let activeFilter = 'all';
+
+      function updateCounts() {
+        totalEl.textContent = counts.all;
+        totalPluralEl.textContent = counts.all === 1 ? '' : 's';
+        Object.keys(counts).forEach(cat => {
+          const el = chipsEl.querySelector('.count[data-count="' + cat + '"]');
+          if (el) el.textContent = counts[cat];
+        });
+      }
+
+      function renderRow(ev) {
+        const row = document.createElement('div');
+        row.className = 'pan-event sev-' + ev.severity;
+        row.dataset.category = ev.category;
+        if (activeFilter !== 'all' && ev.category !== activeFilter) row.classList.add('hidden');
+
+        row.innerHTML =
+          '<span class="pan-pill type-pill sev-' + ev.severity + '">' + ev.type + '</span>' +
+          '<div class="narration">' + ev.narration + '</div>' +
+          '<div class="ts" title="' + ev.ts.toISOString() + '">' + ev.ts.toLocaleTimeString() + '</div>' +
+          '<button type="button" class="raw-toggle">View raw dossier ▸</button>' +
+          '<pre><code></code></pre>';
+
+        // Inject raw JSON safely via textContent, not innerHTML
+        row.querySelector('pre code').textContent = JSON.stringify(ev.raw, null, 2);
+
+        row.querySelector('.raw-toggle').addEventListener('click', function (e) {
+          row.classList.toggle('expanded');
+          e.currentTarget.textContent = row.classList.contains('expanded')
+            ? 'Hide raw dossier ▾'
+            : 'View raw dossier ▸';
+        });
+        return row;
+      }
+
+      function applyFilter(cat) {
+        activeFilter = cat;
+        chipsEl.querySelectorAll('.pan-chip').forEach(c => {
+          c.classList.toggle('active', c.dataset.cat === cat);
+        });
+        logEl.querySelectorAll('.pan-event').forEach(row => {
+          const match = cat === 'all' || row.dataset.category === cat;
+          row.classList.toggle('hidden', !match);
+        });
+      }
+
+      chipsEl.addEventListener('click', function (e) {
+        const chip = e.target.closest('.pan-chip');
+        if (!chip) return;
+        applyFilter(chip.dataset.cat);
+      });
+
+      clearBtn.addEventListener('click', function () {
+        logEl.querySelectorAll('.pan-event').forEach(n => n.remove());
+        Object.keys(counts).forEach(k => counts[k] = 0);
+        updateCounts();
+        if (!emptyEl.isConnected) logEl.appendChild(emptyEl);
+      });
+
+      Panopticon.onEvent(function (ev) {
+        if (emptyEl.isConnected) emptyEl.remove();
+        counts.all += 1;
+        if (counts[ev.category] != null) counts[ev.category] += 1;
+        updateCounts();
+        logEl.prepend(renderRow(ev));
+      });
+    })();
+  </script>
+</body>
 </html>

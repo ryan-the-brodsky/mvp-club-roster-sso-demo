@@ -29,7 +29,10 @@ app.use(
         secret: 'keyboard cat',
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: true },
+        // 'auto' sets the secure flag only when req.secure is true. Combined
+        // with trust proxy above, this means secure cookies on Heroku (HTTPS)
+        // and plain cookies on localhost HTTP — both actually persist.
+        cookie: { secure: 'auto' },
     })
 )
 

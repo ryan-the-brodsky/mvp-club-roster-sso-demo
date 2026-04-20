@@ -7,7 +7,7 @@ const router = express.Router()
 const workos = new WorkOS(process.env.WORKOS_API_KEY)
 const connectionID = process.env.WORKOS_CONNECTION_ID
 const clientID = process.env.WORKOS_CLIENT_ID
-const organizationID = 'org_01KPH4P3MKHP42EFZE2XKQNZNC'
+const organizationID = process.env.WORKOS_ORGANIZATION_ID
 const redirectURI = `${process.env.HOST_URL}/callback`
 const state = ''
 

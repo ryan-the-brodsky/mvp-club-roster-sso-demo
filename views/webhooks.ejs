@@ -106,6 +106,7 @@
       });
 
       clearBtn.addEventListener('click', function () {
+        Panopticon.clearHistory();
         logEl.querySelectorAll('.pan-event').forEach(n => n.remove());
         Object.keys(counts).forEach(k => counts[k] = 0);
         updateCounts();

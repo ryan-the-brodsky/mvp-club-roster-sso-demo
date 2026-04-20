@@ -1,6 +1,8 @@
 (function () {
   const AUDIO_SRC = '/public/audio/i-see-you.mp3';
   const AUDIO_STORAGE_KEY = 'panopticon.audio.enabled';
+  const HISTORY_STORAGE_KEY = 'panopticon.events';
+  const MAX_HISTORY = 100;
   const DEBOUNCE_MS = 3000;
 
   const NARRATIONS = {
@@ -114,6 +116,50 @@
     listeners.forEach(cb => { try { cb(ev); } catch (e) { console.error('[Panopticon] listener error', e); } });
   }
 
+  // ── History (sessionStorage) ───────────────────────────────────────
+  // Events persist across navigations within the tab so a sign-in on The Eye
+  // still shows up when you click over to Confessions. Cleared on tab close
+  // — the Panopticon forgets when the session ends.
+
+  let history = [];
+
+  function loadHistory() {
+    try {
+      const raw = sessionStorage.getItem(HISTORY_STORAGE_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      // ts serializes to ISO string; reconstitute Date instances so consumers
+      // don't have to care how they got here.
+      return arr.map(ev => ({ ...ev, ts: new Date(ev.ts) }));
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveHistory() {
+    try {
+      sessionStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+    } catch (_) {
+      // Storage full or disabled — history continues in memory for the page
+    }
+  }
+
+  function appendHistory(ev) {
+    history.push(ev);
+    while (history.length > MAX_HISTORY) history.shift();
+    saveHistory();
+  }
+
+  function replayHistory() {
+    history = loadHistory();
+    history.forEach(ev => emitToListeners(ev));
+  }
+
+  function clearHistory() {
+    history = [];
+    try { sessionStorage.removeItem(HISTORY_STORAGE_KEY); } catch (_) {}
+  }
+
   // ── Socket ─────────────────────────────────────────────────────────
 
   function connect() {
@@ -126,6 +172,7 @@
     sock.on('webhook event', (payload) => {
       const webhook = payload && payload.webhook ? payload.webhook : payload;
       const ev = classify(webhook);
+      appendHistory(ev);
       maybePlaySound(ev);
       emitToListeners(ev);
     });
@@ -133,12 +180,15 @@
 
   // ── Public API ─────────────────────────────────────────────────────
 
-  window.Panopticon = { onEvent, toggleAudio, classify };
+  window.Panopticon = { onEvent, toggleAudio, clearHistory, classify };
 
   document.addEventListener('DOMContentLoaded', () => {
     setupAudio();
     const btn = document.getElementById('pan-audio-toggle');
     if (btn) btn.addEventListener('click', toggleAudio);
+    // Replay persisted events to listeners BEFORE connecting the socket, so
+    // page renders in chronological order and live events naturally follow.
+    replayHistory();
     connect();
   });
 })();

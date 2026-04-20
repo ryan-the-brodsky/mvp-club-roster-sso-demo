@@ -16,20 +16,12 @@
 
       <div class="pan-card">
         <h3>Surrender credentials</h3>
-        <p class="submit-copy">The Panopticon accepts offerings from the following federated authorities. Your choice is catalogued.</p>
+        <p class="submit-copy">The Panopticon accepts only one offering. Present yourself through Okta, or present yourself nowhere.</p>
 
         <form method="POST" action="/login" class="pan-sso-group">
-          <button type="submit" name="login_method" value="GoogleOAuth" class="pan-sso-btn primary-path">
+          <button type="submit" name="login_method" value="saml" class="pan-sso-btn primary-path">
             <span class="provider-mark">◉</span>
-            <span>Submit via Google</span>
-          </button>
-          <button type="submit" name="login_method" value="MicrosoftOAuth" class="pan-sso-btn">
-            <span class="provider-mark">◈</span>
-            <span>Submit via Microsoft</span>
-          </button>
-          <button type="submit" name="login_method" value="saml" class="pan-sso-btn">
-            <span class="provider-mark">※</span>
-            <span>Submit via Enterprise SAML</span>
+            <span>Submit credentials via Okta</span>
           </button>
         </form>
       </div>

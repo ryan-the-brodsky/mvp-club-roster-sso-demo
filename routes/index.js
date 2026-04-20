@@ -30,6 +30,13 @@ function renderError(res, error, extraDescription) {
     res.render('error.ejs', { error, errorDescription })
 }
 
+// Gate for pages that require an authenticated session. Unauthenticated
+// requests are bounced to /, which renders the landing page.
+function requireAuth(req, res, next) {
+    if (req.session?.isloggedin) return next()
+    res.redirect('/')
+}
+
 router.get('/', function (req, res) {
     if (req.session.isloggedin) {
         res.render('login_successful.ejs', {
@@ -96,7 +103,7 @@ router.get('/logout', async (req, res) => {
     }
 })
 
-router.get('/directories', async (req, res) => {
+router.get('/directories', requireAuth, async (req, res) => {
     try {
         let before = req.query.before
         let after = req.query.after
@@ -121,7 +128,7 @@ router.get('/directories', async (req, res) => {
     }
 })
 
-router.get('/directory', async (req, res) => {
+router.get('/directory', requireAuth, async (req, res) => {
     try {
         const directories = await workos.directorySync.listDirectories()
         const directory = directories.data.filter((directory) => {
@@ -141,7 +148,7 @@ router.get('/directory', async (req, res) => {
     }
 })
 
-router.get('/users', async (req, res) => {
+router.get('/users', requireAuth, async (req, res) => {
     try {
         let directoryId = req.query.id
         if (!directoryId) {
@@ -161,7 +168,7 @@ router.get('/users', async (req, res) => {
     }
 })
 
-router.get('/groups', async (req, res) => {
+router.get('/groups', requireAuth, async (req, res) => {
     try {
         const directoryId = req.query.id
         const groups = await workos.directorySync.listGroups({
@@ -195,7 +202,7 @@ router.post('/webhooks', async (req, res) => {
     }
 })
 
-router.get('/webhooks', async (req, res) => {
+router.get('/webhooks', requireAuth, async (req, res) => {
     try {
         res.render('webhooks.ejs', {
             title: 'Webhooks',

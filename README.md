@@ -62,3 +62,4 @@ npm start
 ## Need help?
 
 If you get stuck and aren't able to resolve the issue by reading our [WorkOS Node.js SDK documentation](https://docs.workos.com/sdk/node), API reference, or tutorials, you can reach out to us at support@workos.com and we'll lend a hand.
+# mvp-club-roster-sso-demo

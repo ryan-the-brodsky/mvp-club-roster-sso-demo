@@ -8,6 +8,12 @@ import { Server } from 'socket.io'
 
 const app = express()
 
+// Heroku (and most PaaS) terminate TLS at the router; the request reaches the
+// dyno over plain HTTP with x-forwarded-proto: https. Without this, req.secure
+// is false, so session cookies configured `secure: true` are never set and the
+// browser loses session state on every request.
+app.set('trust proxy', 1)
+
 const port = process.env.PORT || 8000
 
 app.use('/public', express.static('public'))

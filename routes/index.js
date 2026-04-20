@@ -167,7 +167,7 @@ router.post('/webhooks', async (req, res) => {
     res.sendStatus(200)
 })
 
-app.get('/webhooks', async (req, res) => {
+router.get('/webhooks', async (req, res) => {
     res.render('webhooks.ejs', {
         title: 'Webhooks',
     })

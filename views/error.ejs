@@ -1,18 +1,30 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="../public/stylesheets/style.css" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter" />
-    </head>
-    
-    <body class="container_login">
-        <div class="flex_column">
-            <div class="flex heading_div">
-                <img src="../public/images/workos-logo-with-text.png" alt="workos logo" />
-            </div>
-            <h2><%= error %></h2>
-            <% if( errorDescription ) { %>
-                <p><%= errorDescription %></p>
-            <% } %>
-        </div>
-    </body>
+<!doctype html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { title: 'Moral Turpitude' }) %>
+</head>
+
+<body class="dim">
+  <%- include('partials/nav', { authed: false, active: '' }) %>
+
+  <main class="pan-sin-layout">
+    <div class="pan-sin-inner">
+      <img src="/public/images/eye.svg" alt="" aria-hidden="true" class="pan-eye pulsing pan-sin-eye">
+
+      <h1 class="pan-sin-title">Your moral turpitude displeases the Eye.</h1>
+      <p class="pan-sin-sub">Witness your litany of sins:</p>
+
+      <div class="pan-sin-box">
+        <%= error %><% if (typeof errorDescription !== 'undefined' && errorDescription) { %><span class="sin-descr"><%= errorDescription %></span><% } %>
+      </div>
+
+      <div class="pan-row" style="justify-content:center; gap:12px;">
+        <a href="/" class="pan-btn pan-btn-on-dark">Return and repent</a>
+        <a href="javascript:history.back()" class="pan-btn pan-btn-ghost" style="color:var(--stone); border-color:var(--navy-lifted);">Retreat</a>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
 </html>

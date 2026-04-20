@@ -556,6 +556,64 @@ pre code { color: inherit; }
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
 }
 
+/* ── Error page (moral turpitude) ─────────────────────────────────── */
+
+.pan-sin-layout {
+  min-height: calc(100vh - 76px);
+  display: grid;
+  place-items: center;
+  padding: 64px 24px 96px;
+}
+.pan-sin-inner {
+  max-width: 720px;
+  width: 100%;
+  text-align: center;
+}
+.pan-sin-eye {
+  max-width: 360px;
+  margin: 0 auto 32px;
+  filter: drop-shadow(0 0 60px rgba(217, 119, 6, 0.4));
+}
+.pan-sin-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+  color: var(--stone);
+  line-height: 1.15;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+.pan-sin-sub {
+  color: var(--amber-lifted);
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 0 0 28px;
+}
+.pan-sin-box {
+  background: var(--navy-lifted);
+  border: 1px solid var(--navy-deep);
+  border-left: 4px solid var(--amber);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  color: var(--stone);
+  text-align: left;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 32px;
+}
+.pan-sin-box .sin-descr {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--font-body);
+  font-style: italic;
+  color: rgba(250, 245, 240, 0.7);
+  font-size: 0.9rem;
+}
+
 /* ── Footer ───────────────────────────────────────────────────────── */
 
 .pan-footer {

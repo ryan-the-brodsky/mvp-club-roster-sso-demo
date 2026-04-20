@@ -162,6 +162,7 @@ router.post('/webhooks', async (req, res) => {
         secret: process.env.WORKOS_WEBHOOK_SECRET,
         tolerance: 90000,
     })
+    const io = req.app.get('socketio')
     io.emit('webhook event', { webhook })
 
     res.sendStatus(200)

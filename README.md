@@ -2,6 +2,12 @@
 
 A WorkOS sample app combining SSO, Directory Sync, and live webhook streaming into a single, satirically paranoid surveillance dashboard.
 
+## Demo Video
+
+View the demonstration video [at this youtube link](https://www.youtube.com/watch?v=ndO1PxL1Ytc)
+
+## Origin and Features
+
 This merges two WorkOS reference apps — [`node-sso-example`](https://github.com/workos/node-example-applications/tree/main/node-sso-example) and [`node-directory-sync-example`](https://github.com/workos/node-example-applications/tree/main/node-directory-sync-example) — into one integrated demo. If you've set up either separately before, the steps below will feel familiar; if not, this is the full setup from scratch.
 
 Features:
